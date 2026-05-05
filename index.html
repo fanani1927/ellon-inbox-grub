@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ellon Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap);
+      body {
+        font-family: Inter, sans-serif;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-900 text-slate-200 min-h-screen relative">
+    <div
+      id="loginScreen"
+      class="absolute inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-5"
+    >
+      <div
+        class="bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl w-full max-w-md"
+      >
+        <h2 class="text-3xl font-black text-center mb-8 tracking-tight">
+          <span class="text-blue-500">ELLON</span
+          ><span class="text-white">LISENSI</span>
+        </h2>
+        <input
+          type="text"
+          id="licenseInput"
+          placeholder="Masukkan Lisensi"
+          class="w-full bg-slate-900 text-slate-200 py-3.5 px-4 rounded-lg border border-slate-600 focus:border-blue-500 outline-none mb-4 font-mono text-center tracking-widest"
+        /><button
+          id="btnLoginLic"
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-blue-500/20 transition active:scale-[0.98]"
+        >
+          MASUK APLIKASI
+        </button>
+        <div
+          id="loginMsg"
+          class="mt-4 text-center text-sm font-bold text-rose-500 hidden"
+        ></div>
+      </div>
+    </div>
+    <div
+      id="updateNotification"
+      class="hidden fixed bottom-5 right-5 bg-slate-800 border border-blue-500 p-5 rounded-xl shadow-2xl z-[100] flex flex-col gap-3 w-80"
+    >
+      <p id="updateMessage" class="text-sm font-bold text-slate-200">
+        Memeriksa pembaruan...
+      </p>
+      <button
+        id="btnRestartUpdate"
+        class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow-lg shadow-blue-500/20 transition active:scale-[0.98]"
+        onclick="restartApp()"
+      >
+        RESTART & UPDATE
+      </button>
+    </div>
+    <div id="appMain" class="p-5 md:p-6 max-w-[1400px] mx-auto hidden">
+      <div class="flex flex-col items-center justify-center mb-8">
+        <h1 class="text-4xl font-extrabold tracking-tight text-center">
+          <span class="text-blue-500">ELLON</span
+          ><span class="text-emerald-500">INBOX</span
+          ><span class="text-slate-200">GRUB</span>
+        </h1>
+      </div>
+      <div
+        id="mainGrid"
+        class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-slate-800/40 p-5 rounded-xl border border-slate-700/50"
+      >
+        <div class="flex flex-col md:col-span-full mb-2">
+          <label
+            class="text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider"
+            >Pilihan Mode</label
+          ><select
+            id="modeSelect"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2.5 px-4 rounded-lg border border-slate-600 outline-none focus:border-blue-500 transition shadow-inner"
+          >
+            <option value="10">Buat 10 Grub</option>
+            <option value="20">Buat 20 Grub</option>
+            <option value="Tambah member">Tambah member</option>
+            <option value="Tambah member & Inbox">Tambah member & Inbox</option>
+          </select>
+        </div>
+        <div
+          class="flex flex-col bg-slate-900/50 p-3 rounded-lg border border-slate-700/50"
+          id="boxAcc"
+        >
+          <label
+            class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wide"
+            >Upload Akun(.txt)</label
+          ><input
+            type="file"
+            id="fileAcc"
+            accept=".txt"
+            class="text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white file:font-semibold file:cursor-pointer cursor-pointer w-full"
+          />
+        </div>
+        <div
+          class="flex flex-col bg-slate-900/50 p-3 rounded-lg border border-slate-700/50"
+          id="boxUid"
+        >
+          <label
+            class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wide"
+            >Upload UID(.txt)</label
+          ><input
+            type="file"
+            id="fileUid"
+            accept=".txt"
+            class="text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white file:font-semibold file:cursor-pointer cursor-pointer w-full"
+          />
+        </div>
+        <div
+          class="flex flex-col bg-slate-900/50 p-3 rounded-lg border border-slate-700/50"
+          id="boxLink"
+          style="display: none"
+        >
+          <label
+            class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wide"
+            >Upload Link(.txt)</label
+          ><input
+            type="file"
+            id="fileLink"
+            accept=".txt"
+            class="text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white file:font-semibold file:cursor-pointer cursor-pointer w-full"
+          />
+        </div>
+        <div class="flex flex-col" id="boxJmlUid" style="display: none">
+          <label class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase"
+            >Jml UID / Akun</label
+          ><input
+            type="number"
+            id="jmlUid"
+            value="160"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+        <div class="flex flex-col" id="boxMemReq">
+          <label class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase"
+            >Member / Req</label
+          ><input
+            type="number"
+            id="memReq"
+            value="1"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+        <div class="flex flex-col" id="boxGrpKe">
+          <label class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase"
+            >Grup Sampai Ke</label
+          ><input
+            type="number"
+            id="grpKe"
+            value="1"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+        <div class="flex flex-col" id="boxDlAwal">
+          <label class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase"
+            >Delay Awal</label
+          ><input
+            type="number"
+            id="dlAwal"
+            value="1"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+        <div class="flex flex-col" id="boxDlLanjut">
+          <label class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase"
+            >Delay Lanjut</label
+          ><input
+            type="number"
+            id="dlLanjut"
+            value="0"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+        <div class="flex flex-col" id="boxDup" style="display: none">
+          <label
+            class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase flex items-center gap-2"
+            ><input
+              type="checkbox"
+              id="chkDup"
+              class="w-3.5 h-3.5 text-blue-500 rounded bg-slate-900 border-slate-600"
+              checked="checked"
+            />
+            Duplikat Grup</label
+          ><input
+            type="number"
+            id="valDup"
+            value="10"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+        <div class="flex flex-col" id="boxDlInbox" style="display: none">
+          <label class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase"
+            >Delay Inbox</label
+          ><input
+            type="number"
+            id="dlInbox"
+            value="0.5"
+            step="0.1"
+            class="text-sm font-semibold text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-700 outline-none focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div
+        class="flex flex-wrap items-center justify-between gap-4 mb-4 p-4 bg-slate-800/60 rounded-xl border border-slate-700/50 shadow-md"
+      >
+        <div class="flex items-center gap-5">
+          <div class="flex items-center gap-3">
+            <label class="text-sm font-bold text-slate-400"
+              >Jumlah Browser:</label
+            ><input
+              type="number"
+              id="browserCount"
+              value="5"
+              min="1"
+              max="50"
+              class="text-sm font-bold text-center text-slate-200 bg-slate-900 py-2 px-3 rounded-lg border border-slate-600 outline-none focus:border-blue-500 w-[75px]"
+            />
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer"
+            ><input
+              type="checkbox"
+              id="showBrowserToggle"
+              class="sr-only peer"
+            />
+            <div
+              class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"
+            ></div>
+            <span class="ml-3 text-sm font-bold text-slate-300"
+              >Tampilkan Browser</span
+            ></label
+          >
+        </div>
+        <div id="poolInfo" class="flex gap-3">
+          <div
+            class="text-[11px] text-slate-300 bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg font-bold shadow-inner flex items-center gap-2"
+          >
+            TOTAL<span id="poolTotal" class="text-blue-500 text-sm">0</span>
+          </div>
+          <div
+            class="text-[11px] text-slate-300 bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg font-bold shadow-inner flex items-center gap-2"
+          >
+            BEKERJA<span id="poolBusy" class="text-rose-500 text-sm">0</span>
+          </div>
+          <div
+            class="text-[11px] text-slate-300 bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg font-bold shadow-inner flex items-center gap-2"
+          >
+            SIAP<span id="poolIdle" class="text-emerald-500 text-sm">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <button
+          id="btnCreate"
+          onclick="createBrowsers()"
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-sm tracking-wide transition shadow-lg shadow-blue-500/20 active:scale-[0.98]"
+        >
+          BUAT BROWSER</button
+        ><button
+          id="btn"
+          class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-bold text-sm tracking-wide transition shadow-lg shadow-emerald-500/20 active:scale-[0.98]"
+        >
+          START</button
+        ><button
+          id="btnReset"
+          class="w-full bg-rose-600 hover:bg-rose-500 text-white py-3.5 rounded-xl font-bold text-sm tracking-wide transition shadow-lg shadow-rose-500/20 active:scale-[0.98]"
+        >
+          RESET
+        </button>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div
+          class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center shadow-md relative overflow-hidden"
+        >
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none"
+          ></div>
+          <span
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 z-10"
+            >Total Akun</span
+          ><span id="accCount" class="text-3xl font-black text-blue-400 z-10"
+            >0</span
+          >
+        </div>
+        <div
+          class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center shadow-md relative overflow-hidden"
+        >
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none"
+          ></div>
+          <span
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 z-10"
+            >Target UID</span
+          ><span id="uidCount" class="text-3xl font-black text-purple-400 z-10"
+            >0</span
+          >
+        </div>
+        <div
+          class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center shadow-md relative overflow-hidden"
+        >
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none"
+          ></div>
+          <span
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 z-10"
+            >Target Link</span
+          ><span id="linkCount" class="text-3xl font-black text-amber-400 z-10"
+            >0</span
+          >
+        </div>
+      </div>
+      <div
+        class="bg-slate-800 border border-yellow-700/50 rounded-xl overflow-hidden h-[150px] flex flex-col mb-4 shadow-lg"
+      >
+        <div
+          class="px-4 py-2 border-b border-slate-700 bg-slate-900/50 flex justify-between items-center"
+        >
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+            <span
+              class="text-[11px] font-bold text-yellow-400 uppercase tracking-wider"
+              >System Log Terminal</span
+            >
+          </div>
+        </div>
+        <div
+          class="flex-1 overflow-y-auto bg-[#0B1120] p-3 font-mono text-[11px] leading-relaxed"
+          id="log-content-SYSTEM"
+        ></div>
+      </div>
+      <div
+        class="flex items-center justify-center gap-6 px-4 py-3 bg-slate-800 border border-slate-700/50 rounded-xl mb-6 text-sm font-bold shadow-md"
+      >
+        <div class="text-blue-400 flex items-center gap-2">
+          Proses<span
+            id="statProses"
+            class="text-white bg-slate-900 px-2 py-0.5 rounded ml-1"
+            >0/0</span
+          >
+        </div>
+        <div class="w-px h-4 bg-slate-600"></div>
+        <div class="text-emerald-400 flex items-center gap-2">
+          Berhasil<span
+            id="statBerhasil"
+            class="text-white bg-slate-900 px-2 py-0.5 rounded ml-1"
+            >0</span
+          >
+        </div>
+        <div class="w-px h-4 bg-slate-600"></div>
+        <div class="text-rose-400 flex items-center gap-2">
+          Gagal<span
+            id="statGagal"
+            class="text-white bg-slate-900 px-2 py-0.5 rounded ml-1"
+            >0</span
+          >
+        </div>
+      </div>
+      <div
+        id="monitorContainer"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+      ></div>
+    </div>
+    <script>
+      const { ipcRenderer } = require("electron");
+      const b = document.getElementById("btn"),
+        bR = document.getElementById("btnReset"),
+        ms = document.getElementById("modeSelect"),
+        bC = document.getElementById("btnCreate"),
+        monitorContainer = document.getElementById("monitorContainer");
+      let data = { accs: [], uids: [], links: [] },
+        isTaskDone = false,
+        isTaskRunning = false;
+      document.getElementById("btnLoginLic").onclick = () => {
+        const l = document.getElementById("licenseInput").value,
+          btnL = document.getElementById("btnLoginLic"),
+          msg = document.getElementById("loginMsg");
+        btnL.textContent = "MEMERIKSA...";
+        ipcRenderer.invoke("check-license", l).then((r) => {
+          if (r.success) {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("appMain").classList.remove("hidden");
+          } else {
+            msg.textContent = r.msg;
+            msg.classList.remove("hidden");
+            btnL.textContent = "MASUK APLIKASI";
+          }
+        });
+      };
+      const uN = document.getElementById("updateNotification"),
+        uM = document.getElementById("updateMessage"),
+        bRU = document.getElementById("btnRestartUpdate");
+      ipcRenderer.on("update_available", () => {
+        uM.innerText = "Pembaruan baru sedang diunduh...";
+        uN.classList.remove("hidden");
+      });
+      ipcRenderer.on("update_downloaded", () => {
+        uM.innerText = "Pembaruan siap dipasang.";
+        bRU.classList.remove("hidden");
+        uN.classList.remove("hidden");
+      });
+      function restartApp() {
+        ipcRenderer.send("restart_app");
+      }
+      function controlWorker(id, status) {
+        ipcRenderer.send("worker-control", id, status);
+      }
+      function closeWorker(id) {
+        ipcRenderer.send("close-worker", id);
+        const el = document.getElementById(`monitor-worker-${id}`);
+        if (el) el.remove();
+      }
+      function createMonitorElement(index) {
+        const div = document.createElement("div");
+        div.id = `monitor-worker-${index}`;
+        div.className =
+          "bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-[280px] flex flex-col shadow-xl";
+        div.innerHTML = `<div class="px-3 py-2.5 border-b border-slate-800 bg-slate-800/80 flex justify-between items-center"><span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Browser #${index}</span><div class="flex items-center gap-1"><span id="status-dot-${index}" class="h-2 w-2 rounded-full bg-slate-500 mr-1 shadow-[0_0_5px_currentColor]"></span><button onclick="controlWorker(${index},'running')" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white transition">▶</button><button onclick="controlWorker(${index},'paused')" class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white transition">||</button><button onclick="controlWorker(${index},'stopped')" class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition">■</button><button onclick="closeWorker(${index})" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-400 hover:bg-slate-500 hover:text-white transition">✕</button></div></div><div class="flex-1 overflow-auto bg-[#0B1120] p-2.5 font-mono text-[10.5px] leading-relaxed" id="log-content-${index}"><div class="text-slate-500 italic text-center mt-4">Menunggu...</div></div>`;
+        monitorContainer.appendChild(div);
+      }
+      function createBrowsers() {
+        ipcRenderer.send("create-browsers", {
+          count: document.getElementById("browserCount").value,
+          showBrowser: document.getElementById("showBrowserToggle").checked,
+        });
+        bC.textContent = "TAMBAH BROWSER";
+        if (isTaskRunning) {
+          b.textContent = "START NEW BROWSER";
+          b.disabled = false;
+          b.classList.remove("opacity-50", "cursor-not-allowed", "blur-sm");
+        }
+      }
+      ipcRenderer.on("clear-monitors", () => {
+        monitorContainer.innerHTML = "";
+      });
+      ipcRenderer.on("poolStatus", (e, status) => {
+        document.getElementById("poolTotal").textContent = status.total;
+        document.getElementById("poolBusy").textContent = status.busy;
+        document.getElementById("poolIdle").textContent = status.idle;
+        if (status.workers) {
+          status.workers.forEach((w) => {
+            if (!document.getElementById(`monitor-worker-${w.id}`))
+              createMonitorElement(w.id);
+            const dot = document.getElementById(`status-dot-${w.id}`);
+            if (dot) {
+              let dC =
+                "h-2 w-2 rounded-full mr-1 shadow-[0_0_5px_currentColor] ";
+              if (w.status === "stopped") dC += "bg-slate-500 text-slate-500";
+              else if (w.status === "paused")
+                dC += "bg-amber-500 text-amber-500 animate-pulse";
+              else if (w.busy) dC += "bg-rose-500 text-rose-500 animate-pulse";
+              else dC += "bg-emerald-500 text-emerald-500";
+              dot.className = dC;
+            }
+          });
+        }
+      });
+      ipcRenderer.on("log-v2", (e, d) => {
+        const l = document.getElementById(`log-content-${d.workerId}`);
+        if (l) {
+          const en = document.createElement("div");
+          let c = "text-slate-300",
+            bC = "border-slate-700",
+            bgC = "bg-slate-800/30";
+          if (/sukses|berhasil|✅/i.test(d.msg)) {
+            c = "text-emerald-400 font-medium";
+            bC = "border-emerald-500/50";
+            bgC = "bg-emerald-900/10";
+          } else if (/gagal|error|crash|❌/i.test(d.msg)) {
+            c = "text-rose-400 font-medium";
+            bC = "border-rose-500/50";
+            bgC = "bg-rose-900/10";
+          } else if (/bypass|⚠️|delay|menunggu|warning/i.test(d.msg)) {
+            c = "text-amber-400";
+            bC = "border-amber-500/50";
+            bgC = "bg-amber-900/10";
+          } else if (/start|selesai/i.test(d.msg)) {
+            c = "text-blue-400";
+            bC = "border-blue-500/50";
+            bgC = "bg-blue-900/10";
+          }
+          if (d.msg === "ALL TASKS COMPLETED") {
+            c = "text-emerald-400 font-bold";
+            bC = "border-emerald-500";
+            bgC = "bg-emerald-900/20";
+          }
+          en.className = `mb-1.5 p-1.5 rounded border-l-2 ${bC} ${bgC} break-words`;
+          en.innerHTML =
+            d.workerId === "SYSTEM"
+              ? `<span class="text-slate-500 mr-1">[${d.time}]</span> <span class="text-blue-400 font-bold mr-1">SYS:</span> <span class="${c}">${d.msg}</span>`
+              : `<span class="text-slate-500 text-[9px] mr-1">[${d.time}]</span> <span class="${c}">${d.msg}</span>`;
+          l.appendChild(en);
+          l.scrollTop = l.scrollHeight;
+        }
+      });
+      ipcRenderer.on("clear-worker-log", (e, wId) => {
+        const l = document.getElementById(`log-content-${wId}`);
+        if (l)
+          l.innerHTML =
+            '<div class="text-blue-500 text-center font-bold italic py-2 border-b border-slate-800 mb-2">--- Sesi Akun Baru ---</div>';
+      });
+      ipcRenderer.on("update-stats", (e, s) => {
+        document.getElementById("statProses").textContent =
+          `${s.pulled || 0}/${s.total}`;
+        document.getElementById("statBerhasil").textContent = s.success;
+        document.getElementById("statGagal").textContent = s.fail;
+        document.getElementById("accCount").textContent = Math.max(
+          0,
+          data.accs.length - (s.pulled || 0),
+        );
+        const m = ms.value;
+        if (m.includes("Tambah member"))
+          document.getElementById("uidCount").textContent = Math.max(
+            0,
+            data.uids.length -
+              (s.pulled || 0) *
+                (parseInt(document.getElementById("jmlUid").value) || 160),
+          );
+        if (m === "Tambah member & Inbox")
+          document.getElementById("linkCount").textContent = Math.max(
+            0,
+            data.links.length - (s.pulled || 0),
+          );
+      });
+      const rF = (id, k, cId) =>
+        document.getElementById(id).addEventListener("change", (e) => {
+          const f = e.target.files[0];
+          if (!f) return;
+          const r = new FileReader();
+          r.onload = (ev) => {
+            data[k] = ev.target.result
+              .split(/\r?\n/)
+              .filter((x) => x.trim().length > 0);
+            document.getElementById(cId).textContent = data[k].length;
+          };
+          r.readAsText(f);
+        });
+      rF("fileAcc", "accs", "accCount");
+      rF("fileUid", "uids", "uidCount");
+      rF("fileLink", "links", "linkCount");
+      ms.addEventListener("change", () => {
+        const v = ms.value,
+          iA = v.includes("Tambah member"),
+          iI = v === "Tambah member & Inbox";
+        document.getElementById("boxJmlUid").style.display = iA
+          ? "flex"
+          : "none";
+        document.getElementById("boxDup").style.display = iA ? "flex" : "none";
+        document.getElementById("boxLink").style.display = iI ? "flex" : "none";
+        document.getElementById("boxDlInbox").style.display = iI
+          ? "flex"
+          : "none";
+        if (iA) {
+          document.getElementById("memReq").value = 1;
+          document.getElementById("grpKe").value = 1;
+          document.getElementById("dlAwal").value = 1;
+          document.getElementById("dlLanjut").value = 1;
+          document.getElementById("chkDup").checked = true;
+          document.getElementById("valDup").value = 10;
+        }
+      });
+      b.onclick = () => {
+        if (b.textContent === "START NEW BROWSER") {
+          ipcRenderer.send("start-new-browsers");
+          b.disabled = true;
+          b.classList.add("opacity-50", "cursor-not-allowed", "blur-sm");
+          b.textContent = "RUNNING...";
+          return;
+        }
+        if (data.accs.length === 0) return alert("Upload file Akun!");
+        const m = ms.value;
+        if (m === "Tambah member" && data.uids.length === 0)
+          return alert("Upload file UID!");
+        if (
+          m === "Tambah member & Inbox" &&
+          data.uids.length === 0 &&
+          data.links.length === 0
+        )
+          return alert("Upload UID/Link!");
+        isTaskRunning = true;
+        ipcRenderer.send("start", {
+          accounts: data.accs,
+          uids: data.uids,
+          links: data.links,
+          mode: m,
+          cfg: {
+            jmlUid: document.getElementById("jmlUid").value,
+            dlAwal: document.getElementById("dlAwal").value,
+            dlLanjut: document.getElementById("dlLanjut").value,
+            grpKe: document.getElementById("grpKe").value,
+            memReq: document.getElementById("memReq").value,
+            dupCheck: document.getElementById("chkDup").checked,
+            dupCount: document.getElementById("valDup").value,
+            dlInbox: document.getElementById("dlInbox").value,
+            maxBrowser: document.getElementById("browserCount").value,
+          },
+        });
+        b.disabled = true;
+        b.classList.add("opacity-50", "cursor-not-allowed", "blur-sm");
+      };
+      bR.onclick = () => {
+        ipcRenderer.send("full-reset");
+        data = { accs: [], uids: [], links: [] };
+        isTaskDone = false;
+        isTaskRunning = false;
+        document.getElementById("fileAcc").value = "";
+        document.getElementById("fileUid").value = "";
+        document.getElementById("fileLink").value = "";
+        document.getElementById("accCount").textContent = "0";
+        document.getElementById("uidCount").textContent = "0";
+        document.getElementById("linkCount").textContent = "0";
+        ms.value = "10";
+        document.getElementById("jmlUid").value = 160;
+        document.getElementById("memReq").value = 1;
+        document.getElementById("grpKe").value = 1;
+        document.getElementById("dlAwal").value = 1;
+        document.getElementById("dlLanjut").value = 0;
+        document.getElementById("chkDup").checked = true;
+        document.getElementById("valDup").value = 10;
+        document.getElementById("dlInbox").value = 0.5;
+        document.getElementById("showBrowserToggle").checked = false;
+        bC.textContent = "BUAT BROWSER";
+        b.textContent = "START";
+        b.disabled = false;
+        b.classList.remove("opacity-50", "cursor-not-allowed", "blur-sm");
+        ms.dispatchEvent(new Event("change"));
+        monitorContainer.innerHTML = "";
+        document.getElementById("log-content-SYSTEM").innerHTML = "";
+      };
+      ipcRenderer.on("done", () => {
+        isTaskDone = true;
+        b.disabled = true;
+        b.classList.add("opacity-50", "cursor-not-allowed", "blur-sm");
+      });
+    </script>
+  </body>
+</html>
